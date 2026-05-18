@@ -42,15 +42,15 @@ def calculate_score(alerts):
         score += 3
         reasons.append("volume")
 
-    if "breakout" in alert_types:
-        score += 4
-        reasons.append("breakout")
+    if "bos" in alert_types:
+        score += 5
+        reasons.append("BOS")
 
     if len(alerts) >= 2:
         score += 1
         reasons.append("multiple alerts")
 
-    if score >= 7:
+    if score >= 8:
         status = "CANDIDATE"
     elif score >= 4:
         status = "WATCH"
@@ -72,7 +72,7 @@ async def webhook(request: Request):
 
         symbol = data.get("symbol", "UNKNOWN")
         price = float(data.get("price", 0))
-        alert_type = data.get("alert", "unknown")
+        alert_type = data.get("alert", "unknown").lower()
         interval = data.get("interval", "")
         tradingview_time = data.get("time", "")
 
@@ -128,14 +128,13 @@ def dashboard():
     for symbol, symbol_alerts in grouped.items():
         latest = symbol_alerts[0]
         score, status, reasons = calculate_score(symbol_alerts)
-
         status_class = status.lower()
 
         rows += f"""
         <tr class="{status_class}">
             <td>{symbol}</td>
             <td>{latest[1]}</td>
-            <td>{score}/10</td>
+            <td>{score}/12</td>
             <td><strong>{status}</strong></td>
             <td>{reasons}</td>
             <td>{len(symbol_alerts)}</td>
